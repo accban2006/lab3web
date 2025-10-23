@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Form Validator</title>
+  <style>
+    .error {
+      border-color: red;
+    }
+    .error-message {
+      color: red;
+      font-size: 0.9em;
+      margin-bottom: 10px;
+    }
+    .form-container {
+      max-width: 400px;
+      margin: 50px auto;
+      padding: 30px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 5px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Sign Up Form</h2>
+    <form id="signupForm" onsubmit="return validateData()">
+      <label>Username:</label>
+      <input type="text" id="username">
+      <div id="usernameError" class="error-message"></div>
+
+      <label>Email:</label>
+      <input type="text" id="email">
+      <div id="emailError" class="error-message"></div>
+
+      <label>Password:</label>
+      <input type="password" id="password">
+      <div id="passwordError" class="error-message"></div>
+
+      <label>Confirm Password:</label>
+      <input type="password" id="confirmPassword">
+      <div id="confirmPasswordError" class="error-message"></div>
+
+      <button type="submit" id="submitBtn" disabled>Submit</button>
+    </form>
+  </div>
+
+  <script>
+    const username = document.getElementById("username");
+    const email = document.getElementById("email");
+    const password = document.getElementById("password");
+    const confirmPassword = document.getElementById("confirmPassword");
+    const submitBtn = document.getElementById("submitBtn");
+
+    // Enable button when all inputs filled
+    document.addEventListener("input", function() {
+      if (username.value && email.value && password.value && confirmPassword.value) {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+    });
+
+    // Reusable showError function
+    function showError(text, messageElement) {
+      messageElement.textContent = text;
+    }
+
+    // Clear all errors before validation
+    function clearErrors() {
+      document.querySelectorAll(".error-message").forEach(el => el.textContent = "");
+      document.querySelectorAll("input").forEach(el => el.classList.remove("error"));
+    }
+
+    // Validation logic
+    function validateData() {
+      clearErrors();
+      let isValid = true;
+
+      // Username validation
+      if (username.value.length < 4 || username.value.length > 20 ||
+          !/[a-zA-Z]/.test(username.value) || !/[0-9]/.test(username.value)) {
+        showError("Username must be 4–20 chars and contain both letters and numbers.", document.getElementById("usernameError"));
+        username.classList.add("error");
+        isValid = false;
+      }
+
+      // Email validation
+      if (!email.value.includes("@") || !email.value.includes(".")) {
+        showError("Please enter a valid email address.", document.getElementById("emailError"));
+        email.classList.add("error");
+        isValid = false;
+      }
+
+      // Password validation
+      if (password.value.length < 8 || 
+          !/[a-z]/.test(password.value) || 
+          !/[A-Z]/.test(password.value) || 
+          !/[0-9]/.test(password.value) || 
+          !/[!@#$%^&*]/.test(password.value)) {
+        showError("Password must be 8+ chars and include uppercase, lowercase, number, and symbol.", document.getElementById("passwordError"));
+        password.classList.add("error");
+        isValid = false;
+      }
+
+      // Confirm password validation
+      if (password.value !== confirmPassword.value) {
+        showError("Passwords do not match.", document.getElementById("confirmPasswordError"));
+        confirmPassword.classList.add("error");
+        isValid = false;
+      }
+
+      // ✅ If everything correct → alert success
+      if (isValid) {
+        alert("✅ Registration successful!");
+        return true; // allow form submit
+      }
+
+      return false; // prevent form submit if invalid
+    }
+  </script>
+</body>
+</html>
